@@ -1,0 +1,34 @@
+name: Build and Publish Docker Image
+
+# Ce script se lance à chaque fois que tu envoies du code sur la branche "main"
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    # Donne l'autorisation à GitHub de publier un paquet (l'image Docker)
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Télécharger le code
+        uses: actions/checkout@v4
+
+      - name: Connexion au registre GitHub (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # Mot de passe géré automatiquement par GitHub !
+
+      - name: Construction et publication de l'image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # REMPLACE "ton_pseudo" PAR TON NOM D'UTILISATEUR GITHUB EN MINUSCULES
+          tags: ghcr.io/dnau1973-hash/pdf-cover-generator:latest

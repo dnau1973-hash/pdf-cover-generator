@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  cover-generator:
+    build: .
+    container_name: pdf-cover-generator
+    ports:
+      - "8080:3000"
+    restart: unless-stopped
+    volumes:
+      # Lier le dossier des couvertures générées pour les récupérer facilement
+      - ./data/covers:/usr/src/app/covers
+      
+      # REMPLACE LA GAUCHE DES DEUX POINTS PAR LE VRAI CHEMIN SUR TON ZIMAOS
+      # Exemple : /DATA/AppData/Media ou /media/storage ...
+      - /CHEMIN/VERS/TON/DOSSIER/Media:/usr/src/app/Media:ro

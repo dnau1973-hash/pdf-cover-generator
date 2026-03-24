@@ -16,7 +16,7 @@ app.post('/api/generate', async (req, res) => {
     const options = {
         density: 150,
         saveFilename: exactBaseName, // Utilise le nom d'origine
-        savePath: "./covers",
+        savePath: "covers",
         format: "png",
         width: 800
     };

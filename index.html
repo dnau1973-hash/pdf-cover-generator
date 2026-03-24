@@ -26,7 +26,7 @@
     <div class="explorer">
         <div class="header">
             <span id="backBtn" class="back-btn" style="display: none;">⬅ Retour</span>
-            <span id="currentPathDisplay">/Media/</span>
+            <span id="currentPathDisplay">media/</span>
         </div>
         <div id="fileList">
             </div>
@@ -40,7 +40,7 @@
 
         async function loadExplorer(path) {
             currentPath = path;
-            document.getElementById('currentPathDisplay').textContent = '/Media/' + path;
+            document.getElementById('currentPathDisplay').textContent = 'media/' + path;
             document.getElementById('backBtn').style.display = path ? 'inline-block' : 'none';
             document.getElementById('fileList').innerHTML = '<i>Chargement...</i>';
 

@@ -5,8 +5,7 @@ FROM node:18-alpine
 RUN apk add --no-cache graphicsmagick ghostscript
 
 # On définit le dossier de travail à l'intérieur du conteneur
-WORKDIR /DATA/AppData/pdf-cover-generator
-
+WORKDIR /usr/src/app
 # On copie d'abord les fichiers package.json (pour optimiser le cache de Docker)
 COPY package*.json ./
 

@@ -5,7 +5,7 @@ FROM node:18-alpine
 RUN apk add --no-cache graphicsmagick ghostscript
 
 # On définit le dossier de travail à l'intérieur du conteneur
-WORKDIR /usr/src/app
+WORKDIR /DATA/AppData/pdfcovergenerator
 
 # On copie d'abord les fichiers package.json (pour optimiser le cache de Docker)
 COPY package*.json ./
@@ -17,7 +17,7 @@ RUN npm install
 COPY . .
 
 # On indique que l'application communique sur le port 3000
-EXPOSE 3000
+EXPOSE 3001
 
 # La commande qui sera lancée au démarrage du conteneur
 CMD [ "node", "server.js" ]

@@ -1,10 +1,6 @@
 # Dépendances Node.js
 node_modules/
 
-# Dossiers générés par l'application
-covers/
-Media/
-
 # Fichiers de configuration locaux (Mac/Windows/Docker)
 .DS_Store
 .env

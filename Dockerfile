@@ -1,22 +1,23 @@
+# On part d'une image Node.js ultra-légère
 FROM node:18-alpine
 
-# Installation des dépendances système nécessaires pour lire/convertir les PDF
+# Installation des outils système obligatoires pour traiter les PDF et les images
 RUN apk add --no-cache graphicsmagick ghostscript
 
-# Création du répertoire de l'application
+# On définit le dossier de travail à l'intérieur du conteneur
 WORKDIR /usr/src/app
 
-# Copie des fichiers de configuration NPM
+# On copie d'abord les fichiers package.json (pour optimiser le cache de Docker)
 COPY package*.json ./
 
-# Installation des dépendances Node.js
+# On installe les dépendances Node.js (express, pdf2pic...)
 RUN npm install
 
-# Copie du reste du code
+# On copie tout le reste du projet (server.js, dossier public...)
 COPY . .
 
-# Exposition du port
+# On indique que l'application communique sur le port 3000
 EXPOSE 3000
 
-# Commande de démarrage
-CMD [ "npm", "start" ]
+# La commande qui sera lancée au démarrage du conteneur
+CMD [ "node", "server.js" ]

@@ -1,34 +1,44 @@
 name: Build and Publish Docker Image
 
-# Ce script se lance à chaque fois que tu envoies du code sur la branche "main"
+# Déclenche l'action à chaque fois que tu envoies du code sur la branche "main"
 on:
   push:
     branches: [ "main" ]
 
+# Définition de la tâche
 jobs:
-  build-and-push:
+  build-and-push-image:
     runs-on: ubuntu-latest
-    
-    # Donne l'autorisation à GitHub de publier un paquet (l'image Docker)
+
+    # Autorisations nécessaires pour publier sur le GitHub Container Registry (GHCR)
     permissions:
       contents: read
       packages: write
 
     steps:
-      - name: Télécharger le code
+      - name: 📥 Télécharger le code source
         uses: actions/checkout@v4
 
-      - name: Connexion au registre GitHub (GHCR)
+      - name: 🔑 Connexion au registre GitHub (GHCR)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }} # Mot de passe géré automatiquement par GitHub !
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Construction et publication de l'image
+      - name: 🏷️ Extraction automatique des métadonnées (Nom et Tags)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: 🚀 Construction et Publication de l'image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          # REMPLACE "ton_pseudo" PAR TON NOM D'UTILISATEUR GITHUB EN MINUSCULES
-          tags: ghcr.io/dnau1973-hash/pdf-cover-generator:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

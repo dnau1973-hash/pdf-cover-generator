@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Couvertures</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 40px auto; color: #333; background-color: #f4f7f6; }
+        h1 { text-align: center; color: #2c3e50; }
+        .explorer { border: 1px solid #ddd; border-radius: 8px; padding: 15px; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .header { display: flex; align-items: center; margin-bottom: 15px; font-weight: bold; padding-bottom: 10px; border-bottom: 2px solid #eee; }
+        .back-btn { cursor: pointer; padding: 5px 10px; background: #3498db; color: white; border-radius: 4px; margin-right: 15px; font-size: 14px; transition: background 0.2s; }
+        .back-btn:hover { background: #2980b9; }
+        #currentPathDisplay { color: #555; font-family: monospace; font-size: 16px; }
+        .item { padding: 12px 10px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; transition: background 0.2s; }
+        .item:hover { background: #f0f8ff; }
+        .item:last-child { border-bottom: none; }
+        .icon { font-size: 24px; margin-right: 15px; }
+        .filename { font-size: 16px; word-break: break-all; }
+        #result-container { text-align: center; margin-top: 30px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: none; }
+        #status { font-weight: bold; color: #e67e22; margin-bottom: 15px; font-size: 18px; }
+        img { max-width: 100%; height: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 5px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+    <h1>📚 Tâches en attente (PDF sans couverture)</h1>
+    
+    <div class="explorer">
+        <div class="header">
+            <span id="backBtn" class="back-btn" style="display: none;">⬅ Retour</span>
+            <span id="currentPathDisplay">/Media/</span>
+        </div>
+        <div id="fileList"></div>
+    </div>
+
+    <div id="result-container">
+        <div id="status"></div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let currentPath = '';
+
+        async function loadExplorer(path) {
+            currentPath = path;
+            const displayPath = path === '' ? '/Media/' : '/Media/' + path;
+            document.getElementById('currentPathDisplay').textContent = displayPath;
+            document.getElementById('backBtn').style.display = path ? 'inline-block' : 'none';
+            document.getElementById('fileList').innerHTML = '<i>Chargement en cours...</i>';
+
+            try {
+                const response = await fetch(`/api/explore?path=${encodeURIComponent(path)}`);
+                const data = await response.json();
+
+                if (data.items) {
+                    renderList(data.items);
+                } else {
+                    document.getElementById('fileList').innerHTML = `<span style="color:red">Erreur : ${data.error}</span>`;
+                }
+            } catch (err) {
+                document.getElementById('fileList').innerHTML = '<span style="color:red">Impossible de se connecter.</span>';
+            }
+        }
+
+        function renderList(items) {
+            const listDiv = document.getElementById('fileList');
+            listDiv.innerHTML = '';
+
+            if (items.length === 0) {
+                listDiv.innerHTML = '<div class="item" style="color: #27ae60; font-weight: bold;">🎉 Tous les PDF de ce dossier ont déjà leur couverture !</div>';
+                return;
+            }
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                const icon = item.isDirectory ? '📁' : '📄';
+                div.innerHTML = `<span class="icon">${icon}</span> <span class="filename">${item.name}</span>`;
+                
+                div.onclick = () => {
+                    if (item.isDirectory) {
+                        loadExplorer(item.path);
+                    } else {
+                        generateCover(item.path, item.name);
+                    }
+                };
+                listDiv.appendChild(div);
+            });
+        }
+
+        document.getElementById('backBtn').onclick = () => {
+            const parts = currentPath.split('/');
+            parts.pop();
+            loadExplorer(parts.join('/'));
+        };
+
+        async function generateCover(filePath, fileName) {
+            const resultContainer = document.getElementById('result-container');
+            const statusDiv = document.getElementById('status');
+            const resultDiv = document.getElementById('result');
+            
+            resultContainer.style.display = 'block';
+            statusDiv.style.color = '#e67e22';
+            statusDiv.textContent = `⏳ Génération en cours pour "${fileName}"...`;
+            resultDiv.innerHTML = "";
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filePath })
+                });
+                
+                const data = await response.json();
+
+                if (data.success) {
+                    statusDiv.style.color = '#27ae60';
+                    statusDiv.textContent = "✅ Couverture générée avec succès !";
+                    resultDiv.innerHTML = `<img src="${data.coverUrl}?t=${Date.now()}" alt="Couverture">`;
+                    
+                    // NOUVEAU : On rafraîchit le dossier actuel pour faire disparaître le PDF traité
+                    loadExplorer(currentPath);
+                } else {
+                    statusDiv.style.color = '#c0392b';
+                    statusDiv.innerHTML = `❌ Erreur : ${data.error}`;
+                }
+            } catch (err) {
+                statusDiv.style.color = '#c0392b';
+                statusDiv.innerHTML = `❌ Erreur de communication.`;
+            }
+        }
+
+        loadExplorer('');
+    </script>
+</body>
+</html>

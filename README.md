@@ -21,7 +21,7 @@ L'application est automatiquement construite et hébergée sur le registre de pa
 2. Allez dans l'App Store et cliquez sur **Custom Install** (Installation personnalisée) ou l'icône **"+"**.
 3. Remplissez les champs de la façon suivante :
 
-* **Image :** `ghcr.io/ton_pseudo/pdf-cover-generator:latest` *(remplacez `ton_pseudo` par votre nom d'utilisateur GitHub)*
+* **Image :** `ghcr.io/dnau1973-hash/pdf-cover-generator:latest` *(remplacez `ton_pseudo` par votre nom d'utilisateur GitHub)*
 * **Title :** PDF Cover Generator
 * **Icon :** `https://cdn-icons-png.flaticon.com/512/337/337946.png` *(ou l'URL de votre choix)*
 * **Web UI :** `3001`

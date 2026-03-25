@@ -36,6 +36,8 @@ L'application est automatiquement construite et hébergée sur le registre de pa
 
 ## 💻 Installation classique (Docker Compose)
 
+https://github.com/dnau1973-hash/nezzar-appstore-zimaos/archive/refs/heads/main.zip
+
 Si vous utilisez un serveur Linux classique (Ubuntu, Debian...), voici le fichier `docker-compose.yml` à utiliser :
 
 ```yaml
